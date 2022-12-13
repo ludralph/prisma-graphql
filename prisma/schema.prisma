@@ -1,0 +1,101 @@
+// // This is your Prisma schema file,
+// // learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// generator client {
+//   provider = "prisma-client-js"
+// }
+
+// datasource db {
+//   provider          = "mysql"
+//   url               = "mysql://lime_visible_ebba:N|xXyAOPI0@mysql-db-provision.cm0mkpwj8arx.eu-central-1.rds.amazonaws.com:3306/moccasin_cat"
+//   shadowDatabaseUrl = "mysql://orange_young_lindy:MbkKYZqJv6@mysql-db-provision.cm0mkpwj8arx.eu-central-1.rds.amazonaws.com:3306/gray_swordfish"
+// }
+
+datasource db {
+  provider          = "postgres"
+  url               = "postgresql://amaranth_ready_sukey:kXJbDGyat7@db-provision-postgres23452b4.c8yxynpcltwd.us-east-1.rds.amazonaws.com:5432/yellow_swift"
+  shadowDatabaseUrl = "postgresql://orange_missing_christen:EWryJDq|q7@db-provision-postgres23452b4.c8yxynpcltwd.us-east-1.rds.amazonaws.com:5432/teal_basilisk"
+}
+
+// // datasource db {
+// //   provider = "mongodb"
+// //   url      = "mongodb+srv://ludralph:rGXTLl0Y3faHzAC2@cluster0.tsrkm2s.mongodb.net/testdb?retryWrites=true&w=majority"
+// // }
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["filteredRelationCount"]
+  binaryTargets   = ["native"]
+}
+
+// datasource db {
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+// }
+
+// generator client {
+//   provider = "prisma-client-js"
+// }
+
+// model Ticket {
+//   id        String              @id @default(cuid())
+//   claimedBy String?             @db.VarChar(20)
+//   feedback  TicketFeedbackData?
+// }
+
+// model TicketFeedbackData {
+//   id     String @id @default(uuid())
+//   ticket Ticket @relation(fields: [id], references: [id], onDelete: Cascade)
+//   rating Int
+// }
+
+// enum Role {
+//   USER
+//   ADMIN
+// }
+
+// model Issue {
+//   id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+//   title           String
+//   description     String
+//   members          User[]    
+// }
+
+// model User {
+//   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+//   email     String   @unique
+//   password  String
+//   firstName String
+//   lastName  String
+//   role      Role     @default(USER)
+//   createdAt DateTime @default(now()) @db.Timestamptz(6)
+//   updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+//   issues    Issue[]
+// }
+model Lien {
+  id        String    @id @default(cuid())
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now()) @updatedAt
+  name      String?
+
+
+  lienHolderLetterId           String? //! Changed to FK Document
+  finalLienReceivedId          String? //! Changed to FK Document
+  letterOfRepresentationSentId String? //! Changed to FK Document
+
+
+  lienHolderLetter           Document? @relation(name: "Lien_lienHolderLetter", fields: [lienHolderLetterId], references: [id], onDelete: SetNull, onUpdate: SetNull)
+  finalLienReceived          Document? @relation(name: "Lien_finalLienReceived", fields: [finalLienReceivedId], references: [id], onDelete: SetNull, onUpdate: SetNull)
+  letterOfRepresentationSent Document? @relation(name: "Lien_letterOfRepresentationSent", fields: [letterOfRepresentationSentId], references: [id], onDelete: SetNull, onUpdate: SetNull)
+}
+
+model Document {
+  id         String    @id @default(cuid())
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @default(now()) @updatedAt
+  name       String?
+
+  Lien_lienHolderLetter                 Lien[] @relation("Lien_lienHolderLetter")
+  Lien_finalLienReceived                Lien[] @relation("Lien_finalLienReceived")
+  Lien_letterOfRepresentationSent       Lien[] @relation("Lien_letterOfRepresentationSent")
+}

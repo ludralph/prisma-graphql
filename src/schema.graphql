@@ -1,0 +1,19 @@
+type Query {
+  ordersForUser(userId: ID!): [Order!]!
+  users: [User!]!
+}
+
+type User {
+  id: Int!
+  email: String!
+  name: String
+  orders: [Order!]!
+}
+
+type Order {
+  id: Int!
+  number: String!
+  owner: User!
+  calendar_date: Date
+}
+
