@@ -1,101 +1,487 @@
-// // This is your Prisma schema file,
-// // learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// generator client {
-//   provider = "prisma-client-js"
-// }
-
-// datasource db {
-//   provider          = "mysql"
-//   url               = "mysql://lime_visible_ebba:N|xXyAOPI0@mysql-db-provision.cm0mkpwj8arx.eu-central-1.rds.amazonaws.com:3306/moccasin_cat"
-//   shadowDatabaseUrl = "mysql://orange_young_lindy:MbkKYZqJv6@mysql-db-provision.cm0mkpwj8arx.eu-central-1.rds.amazonaws.com:3306/gray_swordfish"
-// }
-
-datasource db {
-  provider          = "postgres"
-  url               = "postgresql://amaranth_ready_sukey:kXJbDGyat7@db-provision-postgres23452b4.c8yxynpcltwd.us-east-1.rds.amazonaws.com:5432/yellow_swift"
-  shadowDatabaseUrl = "postgresql://orange_missing_christen:EWryJDq|q7@db-provision-postgres23452b4.c8yxynpcltwd.us-east-1.rds.amazonaws.com:5432/teal_basilisk"
-}
-
-// // datasource db {
-// //   provider = "mongodb"
-// //   url      = "mongodb+srv://ludralph:rGXTLl0Y3faHzAC2@cluster0.tsrkm2s.mongodb.net/testdb?retryWrites=true&w=majority"
-// // }
-
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["filteredRelationCount"]
+  previewFeatures = ["filteredRelationCount", "clientExtensions", "multiSchema"]
   binaryTargets   = ["native"]
 }
 
 // datasource db {
-//   provider = "postgresql"
-//   url      = env("DATABASE_URL")
+//   provider = "sqlite"
+//   url      = "file:./dev.db"
+// }
+
+// datasource db {
+//   provider = "postgres"
+//   url      = "postgresql://raphaeletim:postgres@localhost:5432/postgres?schema=public"
+//   // schemas  = ["base"]
+// }
+
+// datasource db {
+//   provider = "mongodb"
+//   url = "mongodb+srv://raphaelumoh:dfY25BjV38ImLE5U@cluster0.cavf0vi.mongodb.net/jwt-basics?retryWrites=true&w=majority"
+// }
+
+// datasource db {
+//   provider = "mysql"
+//   url = "mysql://2jtfcjkav0vfip0js87e:pscale_pw_3wrlyVODFC8JxbF93txrEWIl1SQScBqGa8QHbuLvl3m@aws.connect.psdb.cloud/second-test?sslaccept=strict"
+// }
+
+datasource db {
+  provider = "postgresql"
+  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  shadowDatabaseUrl = env("POSTGRES_URL_NON_POOLING") // used for migrations
+}
+
+// model Applicant {
+//   id           String        @id @db.Uuid
+//   email        String        @unique
+//   applications Application[]
+
+//   @@map("applicants")
+// }
+
+// model Application {
+//   id          String     @id @db.Uuid
+//   name        String
+//   applicantId String?    @map("applicant_id") @db.Uuid
+//   applicant   Applicant? @relation(fields: [applicantId], references: [id])
+
+//   @@index([applicantId])
+//   @@map("applications")
+// }
+// model User {
+//   id       Int        @id @default(autoincrement())
+//   name     String?
+//   devices  Devices[]
+// }
+
+// model Devices {
+//   id     Int    @id @default(autoincrement())
+//   brand  String
+//   name   Json
+//   price  Float  @default(0.0)
+//   userId Int
+//   user   User   @relation(fields: [userId], references: [id])
 // }
 
 // generator client {
 //   provider = "prisma-client-js"
 // }
 
-// model Ticket {
-//   id        String              @id @default(cuid())
-//   claimedBy String?             @db.VarChar(20)
-//   feedback  TicketFeedbackData?
-// }
-
-// model TicketFeedbackData {
-//   id     String @id @default(uuid())
-//   ticket Ticket @relation(fields: [id], references: [id], onDelete: Cascade)
-//   rating Int
-// }
-
-// enum Role {
-//   USER
-//   ADMIN
-// }
-
-// model Issue {
-//   id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-//   title           String
-//   description     String
-//   members          User[]    
+// datasource db {
+//   provider = "sqlite"
+//   url      = env("DATABASE_URL")
 // }
 
 // model User {
-//   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-//   email     String   @unique
-//   password  String
-//   firstName String
-//   lastName  String
-//   role      Role     @default(USER)
-//   createdAt DateTime @default(now()) @db.Timestamptz(6)
-//   updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
-//   issues    Issue[]
+//   id           Int          @id @default(autoincrement())
+//   uuid         Int          @unique
+//   email        String
+//   firstName    String
+//   lastName     String
+//   org_id       Int
+//   dep_id       Int
+//   department   Department   @relation(fields: [dep_id], references: [dep_id])
+//   organization Organization @relation(fields: [org_id], references: [org_id])
 // }
-model Lien {
-  id        String    @id @default(cuid())
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @default(now()) @updatedAt
-  name      String?
 
+// model Organization {
+//   id            Int            @id @default(autoincrement())
+//   org_id        Int            @unique
+//   org_name      String
+//   parent_org_id Int?
+//   prim_loc      String
+//   departments   Department[]
+//   parentOrg     Organization?  @relation("OrganizationParentOrg", fields: [parent_org_id], references: [org_id])
+//   childOrgs     Organization[] @relation("OrganizationParentOrg")
+//   users         User[]
+// }
 
-  lienHolderLetterId           String? //! Changed to FK Document
-  finalLienReceivedId          String? //! Changed to FK Document
-  letterOfRepresentationSentId String? //! Changed to FK Document
+// model Department {
+//   id            Int          @id @default(autoincrement())
+//   dep_id        Int          @unique
+//   dep_name      String
+//   org_id        Int
+//   parent_dep_id Int?
+//   prim_loc      String?
+//   parentDep     Department?  @relation("DepartmentParentDep", fields: [parent_dep_id], references: [dep_id])
+//   childDeps     Department[] @relation("DepartmentParentDep")
+//   organization  Organization @relation(fields: [org_id], references: [org_id])
+//   users         User[]
+// }
 
+// model Post {
+//   id    Int        @id @default(autoincrement())
+//   title String
+//   tags  PostTags[]
+// }
 
-  lienHolderLetter           Document? @relation(name: "Lien_lienHolderLetter", fields: [lienHolderLetterId], references: [id], onDelete: SetNull, onUpdate: SetNull)
-  finalLienReceived          Document? @relation(name: "Lien_finalLienReceived", fields: [finalLienReceivedId], references: [id], onDelete: SetNull, onUpdate: SetNull)
-  letterOfRepresentationSent Document? @relation(name: "Lien_letterOfRepresentationSent", fields: [letterOfRepresentationSentId], references: [id], onDelete: SetNull, onUpdate: SetNull)
+// model PostTags {
+//   id     Int   @id @default(autoincrement())
+//   post   Post? @relation(fields: [postId], references: [id])
+//   tag    Tag?  @relation(fields: [tagId], references: [id])
+//   postId Int?
+//   tagId  Int?
+// }
+
+// model Tag {
+//   id    Int        @id @default(autoincrement())
+//   name  String     @unique
+//   posts PostTags[]
+// }
+
+// model User {
+//   id           Int            @id @default(autoincrement())
+//   name         String
+//   mobile       String?
+//   companies   UserCompany[]
+
+//   @@map("user")
+// }
+
+// model Company {
+//   id    Int            @id @default(autoincrement())
+//   name  String
+//   users UserCompany[]
+
+//   @@map("company")
+// }
+
+// model UserCompany {
+//   userId        Int      @map("user_id")
+//   companyId     Int      @map("company_id")
+//   user          User     @relation(fields: [userId], references: [id])
+//   company       Company  @relation(fields: [companyId], references: [id])
+//   role          String
+
+//   @@id([userId, companyId])
+//   @@map("user_company")
+// }
+
+// // Define the question model
+// model Question {
+//   id        Int        @id @default(autoincrement())
+//   title     String
+//   content   String?
+//   entryDate DateTime   @default(now())
+//   createdAt DateTime   @default(now())
+//   updatedAt DateTime   @updatedAt
+// }
+
+// model User {
+//   id    Int    @id @default(autoincrement())
+//   posts Post[]
+// }
+
+// model Post {
+//   id       Int   @id @default(autoincrement())
+//   author   User? @relation(fields: [authorId], references: [id])
+//   authorId Int?
+// }
+
+// model Currency {
+//   id              Int                   @id @default(autoincrement())
+//   code            String                @unique @db.Char(3)
+//   symbol          String                @db.VarChar(5)
+//   symbolAltNarrow String?               @db.VarChar(5)
+//   Translation     CurrencyTranslation[]
+//   //Country         Country[]
+// }
+
+// model CurrencyTranslation {
+//   id               Int              @id @default(autoincrement())
+//   //type             TranslationsType
+//   displayName      String
+//   displayNameOne   String?
+//   displayNameFew   String?
+//   displayNameMany  String?
+//   displayNameOther String?
+//   Currency         Currency         @relation(fields: [currencyId], references: [id], onDelete: Cascade)
+//   currencyId       Int
+
+//   @@index([currencyId])
+// }
+
+// model Tracking {
+//     tracking_id String   @id @default(cuid())
+//     amount      Float
+//     unit_id     String
+//     unit        Unit     @relation(fields: [unit_id], references: [unit_id])
+//     //profile     Profile  @relation(fields: [profile_id], references: [profile_id])
+//     profile_id  String
+
+//     @@schema("base")
+// }
+
+// model Unit {
+//     unit_id    String     @id @default(cuid())
+//     name       String
+//     trackings  Tracking[]
+//     //profile    Profile?   @relation(fields: [profile_id], references: [profile_id])
+//     profile_id String?
+
+//     @@unique([name, profile_id])
+//     @@schema("base")
+// }
+
+// model Member {
+//   id             String           @id @default(uuid())
+//   token          String           @unique @default(uuid())
+//   summary        Summary[]
+// }
+
+// model Summary {
+//   id           String   @id @default(uuid())
+//   date         DateTime @db.Date
+//   activityTime Int
+//   memberToken  String
+//   member       Member   @relation(fields: [memberToken], references: [id])
+
+//   @@unique([date, memberToken])
+// }
+
+// model Profile {
+//     id String @id @default(uuid())
+//     accountId Int     @unique
+//     //account   Account @relation(fields: [accountId], references: [id])
+//     followees Profile[] @relation("ProfileFollows")
+//     followers Profile[] @relation("ProfileFollows")
+//     @@map("profiles")
+// }
+
+// model User {
+//   id         Int     @id @default(autoincrement())
+//   name       String?
+//   followedBy User[]  @relation("UserFollows")
+//   following  User[]  @relation("UserFollows")
+// }
+
+// model pitches {
+//   id             Int              @id @default(autoincrement())
+//   slug           String?          @unique
+//   name           String?
+//   city           String?
+//   address        String
+//   tel            String?
+//   email          String?
+//   site           String?
+//   descr          String?
+//   pitch_category pitch_category[]
+//   pitch_format   pitch_format[]
+// }
+
+// model category {
+//   category_id    Int              @id @default(autoincrement())
+//   category_slug  String
+//   category_name  String?
+//   category_descr String?
+//   category_tag   String?
+//   pitch_category pitch_category[]
+// }
+
+// model format {
+//   format_id    Int            @id @default(autoincrement())
+//   format_slug  String
+//   format_name  String?
+//   format_descr String?
+//   pitch_format pitch_format[]
+// }
+
+// model pitch_category {
+//   category_id Int
+//   pitch_id    Int
+//   category    category @relation(fields: [category_id], references: [category_id], onDelete: Cascade)
+//   pitches     pitches  @relation(fields: [pitch_id], references: [id], onDelete: NoAction)
+
+//   @@id([category_id, pitch_id])
+// }
+
+// model pitch_format {
+//   format_id Int
+//   pitch_id  Int
+//   format    format  @relation(fields: [format_id], references: [format_id], onDelete: Cascade)
+//   pitches   pitches @relation(fields: [pitch_id], references: [id], onDelete: NoAction)
+
+//   @@id([format_id, pitch_id])
+// }
+
+// model Collection {
+//     id                String                 @id @default(uuid()) @db.Uuid
+//     floorPrices       CollectionFloorPrice[]
+// }
+
+// model CollectionFloorPrice {
+//     id           String     @id @default(uuid()) @db.Uuid
+//     description String
+//     collection   Collection @relation(fields: [collectionId], references: [id])
+//     collectionId String     @db.Uuid
+// }
+
+// model User {
+//   id        Int      @id @default(autoincrement())
+//   name      String
+//   email     String   @unique
+//   jobs      Job[]
+// }
+
+// model Job {
+//   id          Int      @id @default(autoincrement())
+//   title       String
+//   location    String
+//   start_date  DateTime
+//   end_date    DateTime?
+//   user        User     @relation(fields: [userId], references: [id])
+//   userId      Int
+// }
+
+// model User {
+//   id                String         @id @default(auto()) @map("_id") @db.ObjectId
+//   projects          Project[]      @relation(name: "users", fields: [project_ids], references: [id])
+//   project_ids       String[]       @db.ObjectId
+//   createdProjects   Project[]      @relation(name: "pmId")
+
+//   @@map(name: "users")
+// }
+
+// model Project {
+//   id             String        @id @default(auto()) @map("_id") @db.ObjectId
+//   users          User[]        @relation(name: "users", fields: [user_ids], references: [id])
+//   user_ids       String[]      @db.ObjectId
+//   pm             User?         @relation(name: "pmId", fields: [pmId], references: [id], onDelete: Cascade)
+//   pmId           String?       @db.ObjectId
+
+//   @@map(name: "projects")
+// }
+
+// model Zone {
+//   id          String      @id @map("_id") @default(uuid())
+//   zoneId      Int         @unique
+//   name        String
+//   description String?
+//   server      Server       @relation(fields: [serverId], references: [id])
+//   serverId    String
+//   /locations   Location[]
+//   connectedTo       Zone[]     @relation("ConnectedZones", fields: [connectedToIds], references: [id])
+//   connectedToIds    String[]     
+//   connectedFrom     Zone[]     @relation("ConnectedZones", fields: [connectedFromIds], references: [id])
+//   connectedFromIds  String[]     
+// }
+
+// model Appointment{
+//   id           String   @id @default(uuid())
+//   createdAt    DateTime @default(now())
+//   updatedAt    DateTime @updatedAt
+//   date         DateTime @db.Date
+//   room         String   @db.VarChar(45)
+//   observations String   @db.VarChar(255)
+//   deleted      Boolean  @default(false)
+
+// }
+// model tournaments {
+//   id             Int      @id @default(autoincrement())
+//   token          String   @unique
+//   wallet_address String   @db.Text
+//   name           String   @db.Text
+//   twitter        String   @db.Text
+//   participants   Int      @default(0)
+//   address_limit  Boolean  @default(false)
+//   addresses      String?  @db.MediumText
+//   description    String   @db.Text
+//   active         Boolean  @default(true)
+//   startAt        DateTime
+//   createdAt      DateTime @default(now())
+// }
+
+// model Client {
+//   id                      Int @default(autoincrement())
+//   billingAddressId        Int @unique    @map("billing_address_id")
+//   primaryServiceAddressId Int   @unique  @map("primary_service_address_id")
+//   billingAddress          Address @relation("billingAddress", fields: [billingAddressId], references: [id])
+//   // primaryServiceAddress   Address @relation("primaryServiceAddress", fields: [primaryServiceAddressId], references: [id])
+//   // serviceAddresses        Address[] @relation("serviceAddresses")
+// }
+
+// model Address {
+//   id       Int @default(autoincrement())
+//   clientId Int   @unique  @map("client_id")
+//   //client   Client  @relation(fields: [clientId], references: [id])
+// }
+
+// model User { 
+//     id        Int       @id @default(autoincrement())
+//     email     String    @unique
+//     password  String
+//     name      String
+//     avatar    String
+//     createdAt DateTime  @default(now())
+//     updatedAt DateTime  @updatedAt
+//     UserInfo  UserInfo?
+// }
+
+// model UserInfo {
+//     id        Int     @id @default(autoincrement())
+//     user_id   Int     @unique
+//     user      User    @relation(fields: [user_id], references: [id])
+//     is_active Boolean @default(false)
+// }
+
+// enum LinkType {
+//   PRODUCT
+//   COMPANY
+// }
+
+// model Product {
+//   id                 String        @id @default(uuid())
+//   name               String?       @default("")
+//   productDescription Description[] @relation("ProductDescription")
+// }
+
+// model Company {
+//   id                 String        @id @default(uuid())
+//   name               String?       @default("")
+//   companyDescription Description[] @relation("CompanyDescription")
+// }
+
+// model Description {
+//   id          String    @id @default(uuid())
+//   // language        Locale?   @default(IT)
+//   description String?   @default("")
+//   linkType    LinkType? @default(PRODUCT)
+//   externalId  String?   @default("")
+//   product     Product?  @relation("ProductDescription", fields: [externalId], references: [id], map: "product_description_fk")
+//   company     Company?  @relation("CompanyDescription", fields: [externalId], references: [id], map: "company_description_fk")
+// }
+
+// model Comment {
+//   id         Int       @id @default(autoincrement())
+//   body       String
+//   tweet       Tweet   @relation(fields: [tweetId], references: [id])
+//   tweetId    Int
+//   postedBy    User? @relation(fields: [postedById], references: [id])
+//   postedById Int?
+//   comments   Comment[] @relation("CommentToComment")
+//   comment    Comment?  @relation("CommentToComment", fields: [commentId], references: [id])
+//   commentId  Int?
+//   createdAt  DateTime  @default(now())
+// }
+// model User {
+//   id    Int    @id @default(autoincrement())
+//   email String @unique
+//   name  String
+//   username String
+// }
+model User {
+  id    Int    @id @default(autoincrement())
+  name  String
+  jobTitle String
+  posts Post[]
+  age Int
 }
 
-model Document {
-  id         String    @id @default(cuid())
-  createdAt  DateTime? @default(now())
-  updatedAt  DateTime? @default(now()) @updatedAt
-  name       String?
-
-  Lien_lienHolderLetter                 Lien[] @relation("Lien_lienHolderLetter")
-  Lien_finalLienReceived                Lien[] @relation("Lien_finalLienReceived")
-  Lien_letterOfRepresentationSent       Lien[] @relation("Lien_letterOfRepresentationSent")
+model Post {
+  id        Int     @id @default(autoincrement())
+  title     String
+  published Boolean @default(true)
+  authorId  Int
+  author    User    @relation(fields: [authorId], references: [id])
 }
