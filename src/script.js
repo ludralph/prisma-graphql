@@ -1134,23 +1134,56 @@ async function createTestData() {
 //     }
 //   }
 // })
-const res = await prisma.user.findMany(
-  {
-    orderBy:[
-      {
-        UserInfo:{
-          is_active: 'desc'
-        },
+// const res = await prisma.user.findMany(
+//   {
+//     orderBy:[
+//       {
+//         UserInfo:{
+//           is_active: 'desc'
+//         },
 
-      },
-      {
-        name: 'desc'
-      }
-    ]
+//       },
+//       {
+//         name: 'desc'
+//       }
+//     ]
+//   }
+// )
+
+// const shoppingList = await prisma.shoppingList.create({
+//   data: {
+//     name: "Groceries",
+//     createdById: "user_2PFljk6joD9dEh3O2AkbDvrIOsC",
+//     items: {
+//       create: [
+//         {
+//           name: "Apples",
+//           markedDone: false,
+//           addedById: "user_2PFljk6joD9dEh3O2AkbDvrIOsC",
+//         },
+//         {
+//           name: "Bread",
+//           markedDone: false,
+//           addedById: "user_2PFljk6joD9dEh3O2AkbDvrIOsC",
+//         },
+//       ],
+//     },
+//   },
+//   // include: {
+//   //   items: true, // Include the associated ShoppingListItems in the response
+//   // },
+// });
+
+const list = await prisma.shoppingList.findUnique({
+  where: {
+    id: 'clhptl52h0000x51cn0a5hp43',
+  },
+  include:{
+    items: true
   }
-)
+});
 
-console.dir(res,  {depth:Infinity})
+console.dir(list,  {depth:Infinity})
 // console.log(Prisma.dmmf.datamodel.models)
  
 }
